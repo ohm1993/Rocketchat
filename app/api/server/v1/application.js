@@ -1,11 +1,8 @@
-import { hasRole } from '../../../authorization';
-import { Info } from '../../../utils';
 import { API } from '../api';
 
 API.v1.addRoute('getapplication', { authRequired: true }, {
 	get() {
-		const applications =  [
-			{
+		const applications =[{
 			"id": 1,
 			"name":"CALENDAR",
 			"msg":"calender"
@@ -19,8 +16,7 @@ API.v1.addRoute('getapplication', { authRequired: true }, {
 			"id": 3,
 			"name":"PERSONAL",
 			"msg":"personal"
-			}
-		]
+			}]
 		return API.v1.success({ applications });
 	},
 });
