@@ -1,6 +1,7 @@
 import { API } from '../api';
 import { Users } from '../../../models/server';
 import { hasPermission } from '../../../authorization';
+
 API.v1.addRoute('getapplication', { authRequired: true }, {
 	get() {
 		if (!hasPermission(this.userId, 'view-d-room')) {
