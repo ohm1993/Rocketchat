@@ -1,22 +1,27 @@
 import { API } from '../api';
-
+import { Users } from '../../../models/server';
+import { hasPermission } from '../../../authorization';
 API.v1.addRoute('getapplication', { authRequired: true }, {
 	get() {
-		const applications = [{
-			id: 1,
-			name: 'CALENDAR',
-			msg: 'calender',
-		},
-		{
-			id: 2,
-			name: 'UTILITIES',
-			msg: 'utilities',
-		},
-		{
-			id: 3,
-			name: 'PERSONAL',
-			msg: 'personal',
-		}];
-		return API.v1.success({ applications });
+		if (!hasPermission(this.userId, 'view-d-room')) {
+			return API.v1.unauthorized();
+		}
+
+		const { offset, count } = this.getPaginationItems();
+		const { sort, fields, query } = this.parseJsonQuery();
+		query.roles = ['bot'];
+		const users = Users.find(query, {
+			sort: sort || { username: 1 },
+			skip: offset,
+			limit: count,
+			fields,
+		}).fetch();
+
+		return API.v1.success({
+			users,
+			count: users.length,
+			offset,
+			total: Users.find(query).count(),
+		});
 	},
 });
