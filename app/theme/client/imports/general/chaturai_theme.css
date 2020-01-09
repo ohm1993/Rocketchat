@@ -1,0 +1,126 @@
+.rc-old #login-card{
+  background: rgba(0,0,0,0.3);
+}
+
+.intl-tel-input.allow-dropdown .flag-container:hover .selected-flag{
+  background-color: rgba(0,0,0.5);
+}
+.intl-tel-input.separate-dial-code .selected-flag{
+  background-color: rgba(0,0,0,0.5);
+  color: #fff;
+}
+.intl-tel-input.separate-dial-code .selected-flag{
+  background: rgba(0,0,0,0.5) !important;
+}
+.intl-tel-input input, .intl-tel-input input[type=tel], .intl-tel-input input[type=text]{
+  color: #fff;
+}
+.rc-old.full-page .wrapper{
+  /* width: 200px;
+  height: 200px;   */
+  background-position: 0px 0px;
+  background-repeat: repeat-x;
+  background-size: contain;
+  animation: animatedBackground 80s linear infinite alternate;
+  -webkit-transition: opacity 1s ease-in;
+  -moz-transition: opacity 1s ease-in;
+  -o-transition: opacity 1s ease-in;
+  transition: opacity 1s ease-in;
+}
+
+@keyframes animatedBackground {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}
+.rc-input__element#phoneNumber,.rc-input__element#otp{
+  color: #ffffff;
+}
+/* #animate-area {
+  width: 200px;
+  height: 200px;
+  background-image: url(http://placekitten.com/400/200);
+  background-position: 0px 0px;
+  background-repeat: repeat-x;
+  animation: animatedBackground 10s linear infinite alternate;
+} */
+.sidebar{
+  background-color: #fff;
+  border-right: 1px solid #f4f4f4;
+}
+.footer:not(:empty){
+  border-top:1px solid #f4f4f4;
+}
+.sidebar__footer{
+  border-top: 1px solid #f4f4f4;
+}
+
+.sidebar--medium .sidebar-item{
+  background-color: rebeccapurple;
+
+/*
+
+  background: rgb(170,7,107);
+background: -moz-linear-gradient(90deg, rgba(170,7,107,1) 0%, rgba(102,51,153,1) 100%);
+background: -webkit-linear-gradient(90deg, rgba(170,7,107,1) 0%, rgba(102,51,153,1) 100%);
+background: linear-gradient(90deg, rgba(170,7,107,1) 0%, rgba(102,51,153,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#aa076b",endColorstr="#663399",GradientType=1); */
+
+
+background: rgb(170,7,107);
+background: -moz-linear-gradient(90deg, rgba(170,7,107,1) 0%, rgba(102,51,153,0.3071603641456583) 100%);
+background: -webkit-linear-gradient(90deg, rgba(170,7,107,1) 0%, rgba(102,51,153,0.3071603641456583) 100%);
+background: linear-gradient(90deg, rgba(170,7,107,1) 0%, rgba(102,51,153,0.3071603641456583) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#aa076b",endColorstr="#663399",GradientType=1);
+}
+.sidebar--medium .sidebar-item:hover{
+  background-color: rgba(rebeccapurple,0.5);
+}
+
+.rc-header__wrap{
+background: rgb(102,51,153);
+background: linear-gradient(90deg, rgba(102,51,153,1) 0%, rgba(170,7,107,1) 100%);
+color: #fff;
+}
+.sidebar__header{
+  background-color: #f4f4f4;
+  padding: 16px;
+  margin: 0;
+}
+.rc-header__name{
+  color: #fff;
+}
+.rc-room-actions__action.active, .rc-room-actions__action:hover, .rc-room-actions__more-action.active, .rc-room-actions__more-action:hover{
+  color: Gold;
+}
+.message{
+  background-color: #f4f4f4;
+}
+
+.message {
+  position: relative;
+  z-index: 1;
+  min-height: 40px;
+  padding: 15px 25px 15px 75px;
+  line-height: 20px;
+  margin: 10px 20px;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 10px;
+  /* width: 50%; */
+}
+.sidebar-item{
+  color: #ffffff;
+  margin: 5px 7px;
+}
+.sidebar__header{
+  padding: 24px;
+}
+input[type="text"].rc-input__element#message-search{
+  color: #444;
+}
+.message-actions {top: 8px;right: 1.4rem;}

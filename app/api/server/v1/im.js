@@ -142,6 +142,7 @@ API.v1.addRoute(['dm.files', 'im.files'], { authRequired: true }, {
 
 API.v1.addRoute(['dm.history', 'im.history'], { authRequired: true }, {
 	get() {
+		
 		const findResult = findDirectMessageRoom(this.requestParams(), this.user);
 
 		let latestDate = new Date();

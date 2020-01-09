@@ -3,11 +3,13 @@ import { Match, check } from 'meteor/check';
 import { TAPi18n } from 'meteor/rocketchat:tap-i18n';
 import _ from 'underscore';
 import Busboy from 'busboy';
+import speakeasy from 'speakeasy';
 
 import { Users, Subscriptions } from '../../../models/server';
 import { hasPermission } from '../../../authorization';
 import { settings } from '../../../settings';
 import { getURL } from '../../../utils';
+const phoneUtil = require('google-libphonenumber').PhoneNumberUtil.getInstance();
 import {
 	validateCustomFields,
 	saveUser,
@@ -204,6 +206,100 @@ API.v1.addRoute('users.list', { authRequired: true }, {
 			count: users.length,
 			offset,
 			total: Users.find(query).count(),
+		});
+	},
+});
+
+API.v1.addRoute('users.register.phone', { authRequired: false }, {
+	post() {
+		if (this.userId) {
+			return API.v1.failure('Logged in users can not register again.');
+		}
+
+		// We set their username here, so require it
+		// The `registerUser` checks for the other requirements
+		check(this.bodyParams, Match.ObjectIncluding({
+			// name: String,
+			contact: String
+		}));
+
+		let contact = this.bodyParams.contact;
+		let number;
+		try {
+        	number = phoneUtil.parse(contact);
+        } catch (error) {
+        	throw new Meteor.Error('error-not-allowed', 'contact number invalid', {
+				method: 'register',
+			});
+            return;
+        }
+
+        if(!this.bodyParams.name) {
+			this.bodyParams.name = contact;
+		}
+
+		// Register the user
+		const userId = Meteor.call('registerUser', this.bodyParams);
+
+		// Now set their username
+		// Meteor.runAsUser(userId, () => Meteor.call('setUsername', this.bodyParams.name));
+		return API.v1.success({message: 'An otp has been sent. Verify otp to login.'});
+		// return RocketChat.API.v1.success({ user: RocketChat.models.Users.findOneById(userId, { fields: RocketChat.API.v1.defaultFieldsToExclude }) });
+	},
+});
+
+API.v1.addRoute('users.verifyToken', { authRequired: false }, {
+	post() {
+		if (this.userId) {
+			return API.v1.failure('Logged in users can not verify again.');
+		}
+		let window = 2; // minites
+		// We set their username here, so require it
+		// The `registerUser` checks for the other requirements
+		check(this.bodyParams, Match.ObjectIncluding({
+			token: String,
+			contact: String,
+			// username: Match.Optional(String)
+		}));
+		if (!this.bodyParams.username) {
+			this.bodyParams.username = this.bodyParams.contact;
+		}
+		const token = this.bodyParams.token;
+		const invitedUser = Users.findOneByContactNumberandNotVerified(this.bodyParams.contact);
+		if (!invitedUser) {
+			throw new Meteor.Error('error-not-allowed', 'contact number not registered', {
+				method: 'users.verifyToken',
+			});
+			return;
+		}
+		let userId = invitedUser._id;
+		const secret = invitedUser.services.sms;
+		console.log("secret and token  is",secret,token);
+		const verified = speakeasy.totp.verify({ secret: secret,
+                                       encoding: 'base32',
+                                       token: token,
+                                       window: window,
+                                   });
+		if (!verified) {
+			throw new Meteor.Error('error-not-allowed', 'invalid otp', {
+				method: 'users.verifyToken',
+			});
+			return;
+		}
+		// Register the user
+		Users.setContactVerified(invitedUser._id, this.bodyParams.contact);
+
+		// Now set their username
+		// Meteor.runAsUser(userId, () => Meteor.call('setUsername', this.bodyParams.username));
+		const loginToken = Accounts._generateStampedLoginToken();
+		Accounts._insertLoginToken(userId, loginToken);
+		return API.v1.success({
+			status: 'success',
+			data: {
+				authToken: loginToken.token,
+				userId: userId,
+				me: Users.findOneById(userId, { fields: API.v1.defaultFieldsToExclude })
+			}
 		});
 	},
 });

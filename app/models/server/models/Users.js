@@ -755,6 +755,55 @@ export class Users extends Base {
 		return this.update(_id, update);
 	}
 
+	setContact(_id, contact, secret) {
+		const update = {
+			$set: {
+				phones: [{
+					number: contact,
+					verified: false,
+				},
+				],
+				services: {
+					sms: secret
+				}
+			},
+		};
+
+		return this.update(_id, update);
+	}
+
+	setContactVerified(_id, contact) {
+		const query = {
+			_id,
+			phones: {
+				$elemMatch: {
+					number: contact,
+					verified: false,
+				},
+			},
+		};
+
+		const update = {
+			$set: {
+				'phones.$.verified': true,
+			},
+		};
+
+		return this.update(query, update);
+	}
+
+	findOneByContactNumberandNotVerified(contact) {
+		const query = {
+			phones: {
+				$elemMatch: {
+					number: contact,
+					// verified: false, irrespective of verified or not login should work
+				},
+			},
+		};
+		return this.findOne(query);
+	}
+
 	setEmail(_id, email) {
 		const update = {
 			$set: {

@@ -58,3 +58,6 @@
 
 /* RTL */
 @import 'imports/general/rtl.css';
+
+/* customized CSS file for Chaturai Theme */
+@import 'imports/general/chaturai_theme.css';

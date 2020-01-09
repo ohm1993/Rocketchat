@@ -7,6 +7,8 @@ import { Template } from 'meteor/templating';
 import _ from 'underscore';
 import s from 'underscore.string';
 import toastr from 'toastr';
+import intlTelInput from 'intl-tel-input';
+import 'intl-tel-input/build/css/intlTelInput.min.css';
 
 import { settings } from '../../../settings';
 import { callbacks } from '../../../callbacks';
@@ -38,6 +40,10 @@ Template.loginForm.helpers({
 				return t('Register');
 			case 'login':
 				return t('Login');
+			case 'otplogin':
+				return 'Send otp';
+			case 'verifyotp':
+				return 'Verify OTP';
 			case 'email-verification':
 				return t('Send_confirmation_email');
 			case 'forgot-password':
@@ -71,6 +77,9 @@ Template.loginForm.helpers({
 	},
 	manuallyApproveNewUsers() {
 		return settings.get('Accounts_ManuallyApproveNewUsers');
+	},
+	phoneNumberPlaceHolder() {
+		return 'Enter phone number';
 	},
 });
 
@@ -183,7 +192,7 @@ Template.loginForm.onCreated(function() {
 	if (Session.get('loginDefaultState')) {
 		this.state = new ReactiveVar(Session.get('loginDefaultState'));
 	} else {
-		this.state = new ReactiveVar('login');
+		this.state = new ReactiveVar('otplogin');
 	}
 	this.validSecretURL = new ReactiveVar(false);
 	const validateCustomFields = function(formObj, validationObj) {
@@ -222,6 +231,16 @@ Template.loginForm.onCreated(function() {
 			formObj[field.name] = field.value;
 		});
 		const state = instance.state.get();
+		if (state === 'otplogin') {
+			if (!formObj.phoneNumber) {
+				validationObj.phoneNumber = 'Invalid contact';
+			}
+		}
+		if (state === 'verifyotp') {
+			if (!formObj.otp) {
+				validationObj.otp = 'Invalid otp';
+			}
+		}
 		if (state !== 'login') {
 			if (!(formObj.email && /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+\b/i.test(formObj.email))) {
 				validationObj.email = t('Invalid_email');
@@ -271,11 +290,24 @@ Template.loginForm.onCreated(function() {
 });
 
 Template.loginForm.onRendered(function() {
+	debugger;
+	const telInput = $('#phoneNumber')[0];
+	if (Template.instance.iti) {
+		return
+	}
+	Template.instance.iti = intlTelInput(telInput, {
+        separateDialCode: true,
+        utilsScript: "//cdnjs.cloudflare.com/ajax/libs/intl-tel-input/12.3.0/js/utils.js",
+        autoPlaceholder: true,
+        preferredCountries: [ 'in', 'au','ca','fr','de','uk','mx','nz','no','ru','es','se','ch','us','gb'],
+        initialCountry: "in"
+    });
 	Session.set('loginDefaultState');
 	return Tracker.autorun(() => {
 		callbacks.run('loginPageStateChange', this.state.get());
 		switch (this.state.get()) {
 			case 'login':
+			case 'otplogin':
 			case 'forgot-password':
 			case 'email-verification':
 				return Meteor.defer(function() {
