@@ -17,6 +17,9 @@ API.v1.addRoute('getapplication', { authRequired: true }, {
 			limit: count,
 			fields,
 		}).fetch();
+		users.map(function(e){
+			e.t = "d"
+	   });
 
 		return API.v1.success({
 			users,
