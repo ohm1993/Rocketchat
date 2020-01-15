@@ -10,7 +10,21 @@ API.v1.addRoute('getapplication', { authRequired: true }, {
 
 		const { offset, count } = this.getPaginationItems();
 		const { sort, fields, query } = this.parseJsonQuery();
+
+		let result;
+		let botUsers = [];
+		Meteor.runAsUser(this.userId, () => { result = Meteor.call('rooms/get', {}); });
+		result.map(function(username){
+			if(username.t == 'd'){
+				if(username.usernames && username.usernames.length){
+					username.usernames.map(function(user){
+						botUsers.push(user);
+					})
+				}
+			}	
+		})
 		query.roles = ['bot'];
+		query.username = { $nin: botUsers};
 		const users = Users.find(query, {
 			sort: sort || { username: 1 },
 			skip: offset,
@@ -18,7 +32,8 @@ API.v1.addRoute('getapplication', { authRequired: true }, {
 			fields,
 		}).fetch();
 		users.map(function(e){
-			e.t = "d"
+			e.t = "d",
+			e.fname = e.name
 	   });
 
 		return API.v1.success({
